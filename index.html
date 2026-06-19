@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>台中洲際機號 IP 查詢</title>
+  <title>台中洲際資訊工具</title>
   <style>
     :root {
       color-scheme: light;
@@ -39,6 +39,14 @@
     header { padding: 28px 30px 18px; }
     h1 { margin: 0 0 7px; font-size: clamp(24px, 4vw, 32px); letter-spacing: .02em; }
     .subtitle { margin: 0; color: var(--muted); font-size: 14px; }
+    .tabs { display: flex; gap: 9px; padding: 0 30px 22px; }
+    .tab-button {
+      flex: 1; height: 46px; padding: 0 12px; border: 1px solid var(--line);
+      border-radius: 12px; background: #fff; color: var(--muted); font-size: 15px;
+    }
+    .tab-button.active { border-color: var(--brand); background: var(--brand-soft); color: var(--brand); }
+    .tool-panel { display: none; }
+    .tool-panel.active { display: block; }
     .input-area { padding: 10px 30px 28px; }
     label { display: block; margin-bottom: 9px; font-weight: 700; }
     .input-row { display: flex; gap: 10px; }
@@ -75,9 +83,28 @@
       border-radius: 8px; background: white; color: var(--brand); font-size: 13px;
     }
     .footnote { padding: 18px 30px 22px; color: var(--muted); font-size: 12px; line-height: 1.65; }
+    .installments { padding: 4px 30px 30px; }
+    .offer-card {
+      padding: 22px; border: 1px solid #f0d6ca; border-radius: 18px;
+      background: linear-gradient(145deg, #fff6f1, #fff 60%);
+    }
+    .offer-top { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; }
+    .offer-kicker { color: #a0442f; font-size: 13px; font-weight: 800; letter-spacing: .08em; }
+    .offer-title { margin: 5px 0 0; font-size: 26px; }
+    .period-badge {
+      flex: none; padding: 8px 13px; border-radius: 999px; background: #7f3525;
+      color: #fff; font-weight: 800; font-size: 14px;
+    }
+    .threshold { margin: 20px 0; padding: 14px 16px; border-radius: 12px; background: #fff; border: 1px solid #f2ddd4; }
+    .threshold strong { color: #c7382f; font-size: 20px; }
+    .bank-heading { margin: 20px 0 10px; font-size: 14px; color: var(--muted); }
+    .bank-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .bank { padding: 8px 11px; border-radius: 9px; background: var(--brand-soft); color: #0d5b4c; font-weight: 700; font-size: 14px; }
+    .card-list .bank { background: #f3edf8; color: #694080; }
+    .offer-note { margin: 20px 0 0; padding-top: 15px; border-top: 1px dashed #e5c9bd; color: var(--muted); font-size: 13px; line-height: 1.6; }
     @media (max-width: 560px) {
       body { padding: 14px 10px; }
-      header, .input-area { padding-left: 18px; padding-right: 18px; }
+      header, .input-area, .tabs, .installments { padding-left: 18px; padding-right: 18px; }
       .input-row { flex-direction: column; }
       button#query { height: 48px; }
       .result-row { grid-template-columns: 112px 1fr auto; padding: 14px 18px; gap: 8px; }
@@ -90,25 +117,61 @@
   <main>
     <section class="card">
       <header>
-        <h1>台中洲際機號 IP 查詢</h1>
-        <p class="subtitle">輸入 6 碼機號，自動產生設備網路設定</p>
+        <h1>台中洲際資訊工具</h1>
+        <p class="subtitle">常用資訊與工作工具快速查詢</p>
       </header>
 
-      <div class="input-area">
-        <label for="machine">機號</label>
-        <div class="input-row">
-          <input id="machine" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="例如 090217" autofocus>
-          <button id="query" type="button">查詢</button>
-        </div>
-        <div id="error" class="error" role="alert"></div>
-        <div id="meta" class="meta"></div>
-      </div>
+      <nav class="tabs" aria-label="工具分類">
+        <button class="tab-button active" type="button" data-panel="ip-panel">機號轉 IP</button>
+        <button class="tab-button" type="button" data-panel="installment-panel">分期刷卡</button>
+      </nav>
 
-      <div id="results" class="results" aria-live="polite"></div>
-      <div class="footnote">
-        MASK：255.255.0.0<br>
-        08（B1F 家用）與 09（B1F 美食）的高分期 IP 可能相同；依規則，美食不使用高分期。
-      </div>
+      <section id="ip-panel" class="tool-panel active">
+        <div class="input-area">
+          <label for="machine">機號</label>
+          <div class="input-row">
+            <input id="machine" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="例如 090217" autofocus>
+            <button id="query" type="button">查詢</button>
+          </div>
+          <div id="error" class="error" role="alert"></div>
+          <div id="meta" class="meta"></div>
+        </div>
+
+        <div id="results" class="results" aria-live="polite"></div>
+        <div class="footnote">
+          MASK：255.255.0.0<br>
+          08（B1F 家用）與 09（B1F 美食）的高分期 IP 可能相同；依規則，美食不使用高分期。
+        </div>
+      </section>
+
+      <section id="installment-panel" class="tool-panel">
+        <div class="installments">
+          <article class="offer-card">
+            <div class="offer-top">
+              <div>
+                <div class="offer-kicker">分期零利率</div>
+                <h2 class="offer-title">三期合作卡別</h2>
+              </div>
+              <div class="period-badge">3 期</div>
+            </div>
+            <div class="threshold">單筆消費滿 <strong>3,000 元</strong><br>享 3 期 0 利率、免手續費</div>
+
+            <h3 class="bank-heading">合作銀行信用卡</h3>
+            <div class="bank-list">
+              <span class="bank">中國信託</span><span class="bank">玉山銀行</span>
+              <span class="bank">永豐銀行</span><span class="bank">聯邦銀行</span>
+              <span class="bank">華南銀行</span>
+            </div>
+
+            <h3 class="bank-heading">適用聯名卡</h3>
+            <div class="bank-list card-list">
+              <span class="bank">漢神洲際聯名卡</span><span class="bank">漢神百貨聯名卡</span>
+              <span class="bank">漢神巨蛋聯名卡</span>
+            </div>
+            <p class="offer-note">詳情請洽 5 樓服務中心。實際優惠內容與適用條件以現場最新公告為準。</p>
+          </article>
+        </div>
+      </section>
     </section>
   </main>
 
@@ -118,6 +181,13 @@
     const errorBox = document.querySelector('#error');
     const meta = document.querySelector('#meta');
     const floorNames = { '01':'1F', '02':'2F', '03':'3F', '04':'4F', '05':'5F', '06':'6F', '08':'B1F 家用', '09':'B1F 美食' };
+
+    document.querySelector('.tabs').addEventListener('click', event => {
+      const tab = event.target.closest('.tab-button');
+      if (!tab) return;
+      document.querySelectorAll('.tab-button').forEach(item => item.classList.toggle('active', item === tab));
+      document.querySelectorAll('.tool-panel').forEach(panel => panel.classList.toggle('active', panel.id === tab.dataset.panel));
+    });
 
     function calculate() {
       const code = input.value.replace(/\D/g, '').slice(0, 6);
