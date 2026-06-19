@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>台中洲際機號 IP 查詢</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #16243a;
+      --muted: #69758a;
+      --line: #dfe5ee;
+      --brand: #146c5b;
+      --brand-soft: #e8f5f1;
+      --danger: #b42318;
+      --danger-soft: #fff1f0;
+      --surface: rgba(255,255,255,.94);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 15% 10%, #d9efe8 0, transparent 30%),
+        radial-gradient(circle at 90% 85%, #e6ebf7 0, transparent 35%),
+        #f4f7f8;
+      padding: 32px 16px;
+    }
+    main { width: min(760px, 100%); margin: 0 auto; }
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(255,255,255,.8);
+      border-radius: 22px;
+      box-shadow: 0 18px 55px rgba(32, 57, 72, .12);
+      overflow: hidden;
+    }
+    header { padding: 28px 30px 18px; }
+    h1 { margin: 0 0 7px; font-size: clamp(24px, 4vw, 32px); letter-spacing: .02em; }
+    .subtitle { margin: 0; color: var(--muted); font-size: 14px; }
+    .input-area { padding: 10px 30px 28px; }
+    label { display: block; margin-bottom: 9px; font-weight: 700; }
+    .input-row { display: flex; gap: 10px; }
+    input {
+      width: 100%; min-width: 0; height: 52px; padding: 0 16px;
+      border: 2px solid var(--line); border-radius: 13px;
+      background: white; color: var(--ink); font: 700 21px/1 ui-monospace, Consolas, monospace;
+      letter-spacing: .13em; outline: none; transition: .18s;
+    }
+    input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-soft); }
+    button {
+      border: 0; border-radius: 13px; background: var(--brand); color: white;
+      padding: 0 22px; font-weight: 700; font-size: 16px; cursor: pointer;
+    }
+    button:hover { filter: brightness(.95); }
+    .error {
+      display: none; margin-top: 12px; padding: 11px 13px; border-radius: 10px;
+      background: var(--danger-soft); color: var(--danger); font-size: 14px;
+    }
+    .error.show { display: block; }
+    .meta { display: none; margin-top: 12px; color: var(--muted); font-size: 13px; }
+    .meta.show { display: block; }
+    .results { display: none; border-top: 1px solid var(--line); }
+    .results.show { display: block; }
+    .result-row {
+      display: grid; grid-template-columns: 160px 1fr auto; align-items: center;
+      gap: 14px; padding: 15px 30px; border-bottom: 1px solid var(--line);
+    }
+    .result-row:last-child { border-bottom: 0; }
+    .name { color: var(--muted); font-weight: 700; }
+    .value { font: 700 18px/1.25 ui-monospace, Consolas, monospace; word-break: break-all; }
+    .copy {
+      min-width: 54px; height: 32px; padding: 0 10px; border: 1px solid var(--line);
+      border-radius: 8px; background: white; color: var(--brand); font-size: 13px;
+    }
+    .footnote { padding: 18px 30px 22px; color: var(--muted); font-size: 12px; line-height: 1.65; }
+    @media (max-width: 560px) {
+      body { padding: 14px 10px; }
+      header, .input-area { padding-left: 18px; padding-right: 18px; }
+      .input-row { flex-direction: column; }
+      button#query { height: 48px; }
+      .result-row { grid-template-columns: 112px 1fr auto; padding: 14px 18px; gap: 8px; }
+      .value { font-size: 15px; }
+      .footnote { padding-left: 18px; padding-right: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="card">
+      <header>
+        <h1>台中洲際機號 IP 查詢</h1>
+        <p class="subtitle">輸入 6 碼機號，自動產生設備網路設定</p>
+      </header>
+
+      <div class="input-area">
+        <label for="machine">機號</label>
+        <div class="input-row">
+          <input id="machine" inputmode="numeric" maxlength="6" autocomplete="off" placeholder="例如 090217" autofocus>
+          <button id="query" type="button">查詢</button>
+        </div>
+        <div id="error" class="error" role="alert"></div>
+        <div id="meta" class="meta"></div>
+      </div>
+
+      <div id="results" class="results" aria-live="polite"></div>
+      <div class="footnote">
+        MASK：255.255.0.0<br>
+        08（B1F 家用）與 09（B1F 美食）的高分期 IP 可能相同；依規則，美食不使用高分期。
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const input = document.querySelector('#machine');
+    const results = document.querySelector('#results');
+    const errorBox = document.querySelector('#error');
+    const meta = document.querySelector('#meta');
+    const floorNames = { '01':'1F', '02':'2F', '03':'3F', '04':'4F', '05':'5F', '06':'6F', '08':'B1F 家用', '09':'B1F 美食' };
+
+    function calculate() {
+      const code = input.value.replace(/\D/g, '').slice(0, 6);
+      input.value = code;
+      errorBox.classList.remove('show');
+      meta.classList.remove('show');
+      results.classList.remove('show');
+
+      if (!/^\d{6}$/.test(code)) return fail('請輸入完整的 6 碼機號。');
+      const floorCode = code.slice(0, 2);
+      if (floorCode === '07') return fail('樓層代碼 07 為保留碼，無法產生 IP。');
+      if (!floorNames[floorCode]) return fail('樓層代碼須為 01～06、08 或 09。');
+      if (code[2] !== '0') return fail('機號第 3 碼必須為 0。');
+      const seq = Number(code.slice(4, 6));
+      if (seq < 1 || seq > 99) return fail('機號第 5、6 碼序編須為 01～99。');
+
+      const subnet = Number(floorCode) <= 6 ? 40 + Number(floorCode) : 61;
+      const group = Number(code[1] + code[3]);
+      const rows = [
+        ['POS', `10.${subnet}.${group}.${seq}`],
+        ['中信', `10.${subnet}.${group}.${100 + seq}`],
+        ['NCCC', `10.${subnet}.${100 + group}.${seq}`],
+        ['中信高分期', `10.${subnet}.8.${seq}`],
+        ['NCCC 高分期', `10.${subnet}.9.${seq}`],
+        ['Gateway', `10.${subnet}.255.254`],
+        ['DNS1', '10.40.0.131'],
+        ['DNS2', '10.40.0.132']
+      ];
+
+      meta.textContent = `樓層：${floorNames[floorCode]}　｜　機號：${code}`;
+      meta.classList.add('show');
+      results.innerHTML = rows.map(([name, value]) => `
+        <div class="result-row">
+          <div class="name">${name}</div>
+          <div class="value">${value}</div>
+          <button class="copy" type="button" data-value="${value}">複製</button>
+        </div>`).join('');
+      results.classList.add('show');
+    }
+
+    function fail(message) {
+      errorBox.textContent = message;
+      errorBox.classList.add('show');
+    }
+
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/\D/g, '').slice(0, 6);
+      if (input.value.length === 6) calculate();
+    });
+    input.addEventListener('keydown', event => { if (event.key === 'Enter') calculate(); });
+    document.querySelector('#query').addEventListener('click', calculate);
+    results.addEventListener('click', async event => {
+      const button = event.target.closest('.copy');
+      if (!button) return;
+      try {
+        await navigator.clipboard.writeText(button.dataset.value);
+        button.textContent = '已複製';
+        setTimeout(() => button.textContent = '複製', 900);
+      } catch (_) {
+        button.textContent = '請手動複製';
+      }
+    });
+  </script>
+</body>
+</html>
+
