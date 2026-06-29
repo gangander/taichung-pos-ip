@@ -83,25 +83,39 @@
       border-radius: 8px; background: white; color: var(--brand); font-size: 13px;
     }
     .footnote { padding: 18px 30px 22px; color: var(--muted); font-size: 12px; line-height: 1.65; }
-    .installments { padding: 4px 30px 30px; }
+    .installments { display: grid; gap: 16px; padding: 4px 30px 30px; }
     .offer-card {
       padding: 22px; border: 1px solid #f0d6ca; border-radius: 18px;
       background: linear-gradient(145deg, #fff6f1, #fff 60%);
     }
+    .offer-card.limited { border-color: #cbd9f2; background: linear-gradient(145deg, #f2f6ff, #fff 60%); }
+    .offer-card.high-period { border-color: #d8caea; background: linear-gradient(145deg, #f8f3ff, #fff 60%); }
     .offer-top { display: flex; justify-content: space-between; gap: 14px; align-items: flex-start; }
     .offer-kicker { color: #a0442f; font-size: 13px; font-weight: 800; letter-spacing: .08em; }
+    .limited .offer-kicker { color: #315d9b; }
+    .high-period .offer-kicker { color: #694080; }
     .offer-title { margin: 5px 0 0; font-size: 26px; }
-    .period-badge {
+    .date-badge {
       flex: none; padding: 8px 13px; border-radius: 999px; background: #7f3525;
       color: #fff; font-weight: 800; font-size: 14px;
     }
-    .threshold { margin: 20px 0; padding: 14px 16px; border-radius: 12px; background: #fff; border: 1px solid #f2ddd4; }
-    .threshold strong { color: #c7382f; font-size: 20px; }
+    .limited .date-badge { background: #315d9b; }
+    .high-period .date-badge { background: #694080; }
+    .plan-list { display: grid; gap: 10px; margin-top: 20px; }
+    .plan {
+      display: grid; grid-template-columns: 64px 1fr; gap: 13px; align-items: start;
+      padding: 14px; border: 1px solid rgba(127,53,37,.15); border-radius: 13px; background: #fff;
+    }
+    .plan-period { padding: 7px 5px; border-radius: 9px; background: #fff0e9; color: #a0442f; text-align: center; font-size: 17px; font-weight: 900; }
+    .limited .plan-period { background: #eaf1ff; color: #315d9b; }
+    .high-period .plan-period { background: #f1e8fb; color: #694080; }
+    .plan-detail { color: var(--muted); font-size: 13px; line-height: 1.55; }
+    .plan-detail strong { display: block; margin-bottom: 3px; color: var(--ink); font-size: 16px; }
     .bank-heading { margin: 20px 0 10px; font-size: 14px; color: var(--muted); }
     .bank-list { display: flex; flex-wrap: wrap; gap: 8px; }
     .bank { padding: 8px 11px; border-radius: 9px; background: var(--brand-soft); color: #0d5b4c; font-weight: 700; font-size: 14px; }
-    .card-list .bank { background: #f3edf8; color: #694080; }
     .offer-note { margin: 20px 0 0; padding-top: 15px; border-top: 1px dashed #e5c9bd; color: var(--muted); font-size: 13px; line-height: 1.6; }
+    .reject-alert { margin-top: 17px; padding: 13px 15px; border-radius: 11px; background: #fff0f0; border: 1px solid #f2c3c0; color: #a42620; font-weight: 800; font-size: 14px; line-height: 1.55; }
     @media (max-width: 560px) {
       body { padding: 14px 10px; }
       header, .input-area, .tabs, .installments { padding-left: 18px; padding-right: 18px; }
@@ -110,6 +124,10 @@
       .result-row { grid-template-columns: 112px 1fr auto; padding: 14px 18px; gap: 8px; }
       .value { font-size: 15px; }
       .footnote { padding-left: 18px; padding-right: 18px; }
+      .offer-card { padding: 18px; }
+      .offer-top { display: block; }
+      .date-badge { display: inline-block; margin-top: 12px; }
+      .plan { grid-template-columns: 58px 1fr; padding: 12px; gap: 10px; }
     }
   </style>
 </head>
@@ -149,26 +167,71 @@
           <article class="offer-card">
             <div class="offer-top">
               <div>
-                <div class="offer-kicker">分期零利率</div>
-                <h2 class="offer-title">三期合作卡別</h2>
+                <div class="offer-kicker">一般分期｜全年適用</div>
+                <h2 class="offer-title">3 期零利率</h2>
               </div>
-              <div class="period-badge">3 期</div>
+              <div class="date-badge">7/2－12/31</div>
             </div>
-            <div class="threshold">單筆消費滿 <strong>3,000 元</strong><br>享 3 期 0 利率、免手續費</div>
-
-            <h3 class="bank-heading">合作銀行信用卡</h3>
+            <div class="plan-list">
+              <div class="plan">
+                <div class="plan-period">3 期</div>
+                <div class="plan-detail"><strong>單筆滿 3,000 元</strong>0 利率、免手續費</div>
+              </div>
+            </div>
+            <h3 class="bank-heading">適用銀行</h3>
             <div class="bank-list">
               <span class="bank">中國信託</span><span class="bank">玉山銀行</span>
               <span class="bank">永豐銀行</span><span class="bank">聯邦銀行</span>
-              <span class="bank">華南銀行</span>
+              <span class="bank">華南銀行</span><span class="bank">滙豐銀行</span>
+              <span class="bank">遠東商銀</span><span class="bank">第一銀行</span>
             </div>
+            <p class="offer-note">活動期間：2026/7/2～2026/12/31</p>
+          </article>
 
-            <h3 class="bank-heading">適用聯名卡</h3>
-            <div class="bank-list card-list">
-              <span class="bank">漢神洲際聯名卡</span><span class="bank">漢神百貨聯名卡</span>
-              <span class="bank">漢神巨蛋聯名卡</span>
+          <article class="offer-card limited">
+            <div class="offer-top">
+              <div>
+                <div class="offer-kicker">限時活動</div>
+                <h2 class="offer-title">3／6／12 期零利率</h2>
+              </div>
+              <div class="date-badge">7/2－7/12</div>
             </div>
-            <p class="offer-note">詳情請洽 5 樓服務中心。實際優惠內容與適用條件以現場最新公告為準。</p>
+            <div class="plan-list">
+              <div class="plan">
+                <div class="plan-period">3 期</div>
+                <div class="plan-detail"><strong>單筆滿 3,000 元</strong>中信、玉山、永豐、聯邦、華南、滙豐、遠東、第一</div>
+              </div>
+              <div class="plan">
+                <div class="plan-period">6 期</div>
+                <div class="plan-detail"><strong>單筆滿 6,000 元</strong>中信、玉山、永豐、聯邦、華南、滙豐、遠東、第一</div>
+              </div>
+              <div class="plan">
+                <div class="plan-period">12 期</div>
+                <div class="plan-detail"><strong>單筆滿 10,000 元</strong>中國信託、玉山銀行、滙豐銀行</div>
+              </div>
+            </div>
+            <p class="offer-note">活動期間：2026/7/2～2026/7/12。實際優惠依當期公告為準。</p>
+          </article>
+
+          <article class="offer-card high-period">
+            <div class="offer-top">
+              <div>
+                <div class="offer-kicker">高分期代號</div>
+                <h2 class="offer-title">僅限 2 家合作銀行</h2>
+              </div>
+              <div class="date-badge">高分期</div>
+            </div>
+            <div class="plan-list">
+              <div class="plan">
+                <div class="plan-period">華南</div>
+                <div class="plan-detail"><strong>可刷 3、6 期</strong>其他期數不適用</div>
+              </div>
+              <div class="plan">
+                <div class="plan-period">玉山</div>
+                <div class="plan-detail"><strong>可刷 6、12、24 期</strong>其他期數不適用</div>
+              </div>
+            </div>
+            <div class="reject-alert">重要：不在上述銀行及期數內的交易，都會被拒絕。</div>
           </article>
         </div>
       </section>
