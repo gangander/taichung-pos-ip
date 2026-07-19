@@ -307,6 +307,15 @@
     const errorBox = document.querySelector('#error');
     const meta = document.querySelector('#meta');
     const floorNames = { '01':'1F', '02':'2F', '03':'3F', '04':'4F', '05':'5F', '06':'6F', '08':'B1F 家用', '09':'B1F 美食' };
+    const specialMachines = {
+      '999953': {
+        floorName: 'B1F 特殊機號',
+        subnet: 61,
+        group: 99,
+        seq: 53,
+        note: '特殊機號 999953：使用 B1F 網段 61，組合 99，序號 53。'
+      }
+    };
 
     document.querySelector('.tabs').addEventListener('click', event => {
       const tab = event.target.closest('.tab-button');
@@ -323,6 +332,9 @@
       results.classList.remove('show');
 
       if (!/^\d{6}$/.test(code)) return fail('請輸入完整的 6 碼機號。');
+      const special = specialMachines[code];
+      if (special) return showResults(code, special.floorName, special.subnet, special.group, special.seq, special.note);
+
       const floorCode = code.slice(0, 2);
       if (floorCode === '07') return fail('樓層代碼 07 為保留碼，無法產生 IP。');
       if (!floorNames[floorCode]) return fail('樓層代碼須為 01～06、08 或 09。');
@@ -332,6 +344,10 @@
 
       const subnet = Number(floorCode) <= 6 ? 40 + Number(floorCode) : 61;
       const group = Number(code[1] + code[3]);
+      showResults(code, floorNames[floorCode], subnet, group, seq);
+    }
+
+    function showResults(code, floorName, subnet, group, seq, note = '') {
       const rows = [
         ['POS', `10.${subnet}.${group}.${seq}`],
         ['中信', `10.${subnet}.${group}.${100 + seq}`],
@@ -343,7 +359,7 @@
         ['DNS2', '10.40.0.132']
       ];
 
-      meta.textContent = `樓層：${floorNames[floorCode]}　｜　機號：${code}`;
+      meta.textContent = note || `樓層：${floorName}　｜　機號：${code}`;
       meta.classList.add('show');
       results.innerHTML = rows.map(([name, value]) => `
         <div class="result-row">
